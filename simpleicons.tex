@@ -1,0 +1,55 @@
+\pdfmapfile{+simpleicons.map}
+\documentclass{article}
+\usepackage{xparse}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{shortvrb}
+\usepackage{longtable}
+\usepackage{simpleicons}
+\MakeShortVerb{\|}
+\setlength{\parindent}{0pt}
+\begin{document}
+\title{The \textsf{simpleicons} package\\High quality icons for popular brands}
+\author{%
+    Simple Icons (Font)\\%
+    Inesh Bose (\LaTeX{} package)%
+}
+\maketitle
+
+This package provides \LaTeX{} support for the Simple Icons logos.
+To use Simple Icons in your document, include the package with |\usepackage{simpleicons}|.
+
+An icon can be accessed using the icon name (one word, lowercase). To do this, you can use |\simpleicon{thebrandname}|.
+A list of all included icons with their respective commands can be found at the end of this document.
+
+\subsection*{Example}
+\begin{verbatim}
+...
+\usepackage{simpleicons}
+...
+\begin{document}
+...
+\simpleicon{github}
+...
+\end{document}
+\end{verbatim}
+Result: \simpleicon{github}
+
+\subsection*{Bugs}
+This package is very new and in alpha stage right now. For bug reports and feature requests, report on the GitHub repository \href{https://github.com/ineshbose/simple-icons-latex}{\nolinkurl{https://github.com/ineshbose/simple-icons-latex}}.
+
+If you get an error "|dfTeX error: pdflatex: Font at 600 not found|", add |\pdfmapfile{+simpleicons.map}| in the preamble.
+
+\newpage
+\section*{List of icons}
+\newenvironment{showcase}{%
+   \begin{longtable}{clll}
+   \cmidrule[\heavyrulewidth]{1-3}% \toprule
+   \bfseries Icon& \bfseries Name& \bfseries Direct command& \\
+   \cmidrule{1-3}\endhead}
+  {\cmidrule[\heavyrulewidth]{1-3}\end{longtable}}
+\NewDocumentCommand{\showcaseicon}{mmo}{%
+  \simpleicon{#1}& \itshape #1& \ttfamily \textbackslash #2\index{\ttfamily \textbackslash #2}& \IfNoValueTF{#3}{}{\textit{#3}}\\}
+
+\input{bindings}
+\end{document}

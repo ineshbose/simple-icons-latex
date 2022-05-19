@@ -1,4 +1,5 @@
-const { writeFileSync } = require("fs");
+const { version, dependencies } = require("./package.json");
+const { writeFileSync, renameSync } = require("fs");
 const { execSync } = require("child_process");
 const { loadSync, Font } = require("opentype.js");
 
@@ -17,6 +18,7 @@ const NUMBERS = [
   "nine",
   "ten",
 ];
+const incompatGlyphs = ["lerna"];
 
 const {
   unitsPerEm,
@@ -28,7 +30,8 @@ const glyphs = [];
 
 for (var i = 0; i < rawGlyphs.length; i++) {
   const glyph = rawGlyphs.get(i);
-  if (glyph.name && glyph.unicode) {
+  if (glyph.name && glyph.unicode && !incompatGlyphs.includes(glyph.name)) {
+    glyph.name = glyph.name.replace(/[^a-zA-Z0-9 ]/g, "");
     glyphs.push(glyph);
   }
 }
@@ -43,6 +46,7 @@ const font = new Font({
 });
 
 font.download("SimpleIcons.otf");
+write("bindings.tex", String.raw`\begin{showcase}`);
 
 const encfiles = [];
 glyphs.forEach(({ name, unicode }, idx) => {
@@ -71,9 +75,17 @@ glyphs.forEach(({ name, unicode }, idx) => {
     String.raw`
   \expandafter\def\csname simpleicon@${name}\endcsname {\SI${
       NUMBERS[encfiles.length]
-    }\symbol{${idx}}}`
+    }\symbol{${idx % 256}}}`
+  );
+  write(
+    "bindings.tex",
+    String.raw`
+  \showcaseicon{${name}}{simpleicon\{${name}\}}
+  `
   );
 });
+
+write("bindings.tex", String.raw`\end{showcase}`);
 
 for (
   var i = 0, { length: fileCount } = encfiles;
@@ -105,16 +117,20 @@ write(
           `--name=SimpleIcons--${filename}`,
         ].join(" "),
         { encoding: "utf-8" }
-      );
+      ).replace(/SimpleIconsFiltered/g, "SimpleIcons");
     })
     .join("")
 );
+
+renameSync("SimpleIconsFiltered.pfb", "SimpleIcons.pfb");
 
 write(
   "simpleicons.sty",
   String.raw`
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{simpleicons}[${date} Simple Icons Logo]
+\ProvidesPackage{simpleicons}[${date} ${version} Simple Icons ${
+    dependencies["simple-icons-font"]
+  } Logos]
 
 
 \RequirePackage{ifxetex,ifluatex}
