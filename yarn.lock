@@ -10,10 +10,10 @@ opentype.js@^1.3.4:
     string.prototype.codepointat "^0.2.1"
     tiny-inflate "^1.0.3"
 
-simple-icons-font@^6.21.0:
-  version "6.21.0"
-  resolved "https://registry.yarnpkg.com/simple-icons-font/-/simple-icons-font-6.21.0.tgz#46d7770bfd10be9724a3f9e720665344812a1a88"
-  integrity sha512-nqQnTkAssjrgQb+hymKG5eotM1x4UtemYh2CNo7T/bMHtSnH17kBhxq5D6Aga0fAYwGGdoTD372R8kUQL/NDQQ==
+simple-icons-font@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/simple-icons-font/-/simple-icons-font-7.0.0.tgz#41c42aea8a9cbe57824b33d5d75d9645709be0ca"
+  integrity sha512-e8Bn80c1LpWVJJEdj4s2eTxCNGHrUhBebsC/lpItYN8eBzErU4qjx7Zj/qmtPpY2854zK7XsCyHTZ6ng2i9ttw==
 
 string.prototype.codepointat@^0.2.1:
   version "0.2.1"
