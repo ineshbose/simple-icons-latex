@@ -10,22 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
+      - name: Setup repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1.3.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge Dependabot PR for Simple Icons
         if: ${{contains(steps.metadata.outputs.dependency-names, 'simple-icons-font')}}
         run: |
-          gh pr checkout $PR_NUM
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
           npm --no-git-tag-version version $NEW_VER
-          git add package.json
-          git commit -m "Version bump"
+          git commit -am "Version bump"
+          git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY
           git push
           gh pr merge --auto --merge --squash "$PR_URL"
         env:
           NEW_VER: ${{ steps.metadata.outputs.new-version }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-          PR_NUM: ${{ github.event.pull_request.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
