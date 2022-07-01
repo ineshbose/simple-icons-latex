@@ -465,3 +465,6 @@ TSWLatexianTemp*
 
 bindings.tex
 *glyphs-*.tex
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

@@ -1,8 +1,8 @@
 name: Release latest version
 on:
-  push:
-    branches:
-      - "master"
+  schedule:
+    - cron: 0 0 * * 5
+  workflow_dispatch:
 
 jobs:
   auto-release:
@@ -11,25 +11,33 @@ jobs:
       - name: Setup repository
         uses: actions/checkout@v3
         with:
+          ref: develop
           fetch-depth: 0
       - name: Get release version
         id: get-version
         run: |
-          export PACKAGE_VERSION=$(cat package.json | grep 'version' | sed 's/[ \",:]//g' | sed 's/version//')
-          echo "::set-output name=version::$PACKAGE_VERSION"
-      - name: Get previous version
-        id: prev-version
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+          simple_icons_version="$(curl --retry 5 -s https://api.github.com/repos/simple-icons/simple-icons-font/releases/latest | jq -r .tag_name)"
+          echo "::set-output name=si::$simple_icons_version"
+          echo "::set-output name=lib::$(cat package.json | grep '"version":' | cut -d'"' -f4)"
       - name: Exit if not new version
-        if: ${{ steps.get-version.outputs.version == steps.prev-version.outputs.tag }}
+        if: ${{ steps.get-version.outputs.lib == steps.get-version.outputs.si }}
         run: exit 1
+      - name: Bump version and commit
+        run: |
+          sed -i 's/"version": "${{ steps.get-version.outputs.lib }}",/"version": "${{ steps.get-version.outputs.si }}",/' package.json
+          sed -i 's/"simple-icons-font": "${{ steps.get-version.outputs.lib }}"/"simple-icons-font": "${{ steps.get-version.outputs.si }}"/' package.json
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Version bump"
+          git push origin develop
+          git switch master
+          git pull origin develop
+          git tag -a "${{ steps.get-version.outputs.si }}" -m ""
+          git push --follow-tags origin master
       - name: Install otftotfm
         run: sudo apt-get install -y lcdf-typetools
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Install dependendies
+      - name: Install dependencies
         run: yarn
       - name: Run script
         run: node bindings.js
@@ -37,12 +45,12 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: simpleicons.tex
-      - name: Make directories
-        run: mkdir -p simpleicons simpleicons/{doc,enc,map,opentype,tex,tfm,type1}
       - name: Move files
         run: |
+          mkdir -p simpleicons simpleicons/{doc,enc,map,opentype,tex,tfm,type1}
           cp README.md simpleicons
           mv -t simpleicons/doc simpleicons.pdf simpleicons.tex bindings.tex
+          cp simpleicons/doc/simpleicons.pdf .
           mv *.enc simpleicons/enc
           mv simpleicons.map simpleicons/map
           mv SimpleIcons.otf simpleicons/opentype
@@ -57,7 +65,7 @@ jobs:
           file_path: simpleicons.zip
           fields: |
             pkg: simpleicons
-            version: ${{ steps.get-version.outputs.version }}
+            version: ${{ steps.get-version.outputs.si }}
             author: Inesh Bose
             email: Inesh.Bose@glasgow.ac.uk
             uploader: Inesh.Bose@glasgow.ac.uk
@@ -66,10 +74,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: v${{ steps.get-version.outputs.version }}
-          tag_name: ${{ steps.get-version.outputs.version }}
+          name: v${{ steps.get-version.outputs.si }}
+          tag_name: ${{ steps.get-version.outputs.si }}
           body: |
-            See https://github.com/simple-icons/simple-icons/releases/tag/${{ steps.get-version.outputs.version }}
+            See https://github.com/simple-icons/simple-icons/releases/tag/${{ steps.get-version.outputs.si }}
           files: |
             simpleicons.zip
             simpleicons.pdf
