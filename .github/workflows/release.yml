@@ -26,11 +26,14 @@ jobs:
         run: |
           sed -i 's/"version": "${{ steps.get-version.outputs.lib }}",/"version": "${{ steps.get-version.outputs.si }}",/' package.json
           sed -i 's/"simple-icons-font": "${{ steps.get-version.outputs.lib }}"/"simple-icons-font": "${{ steps.get-version.outputs.si }}"/' package.json
+
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
           git add .
           git commit -m "Version bump"
           git push origin develop
+
           git switch master
           git pull origin develop
           git tag -a "${{ steps.get-version.outputs.si }}" -m ""
@@ -45,32 +48,31 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: simpleicons.tex
-      - name: Move files
+      - name: Move files and make archive
         run: |
           mkdir -p simpleicons simpleicons/{doc,enc,map,opentype,tex,tfm,type1}
           cp README.md simpleicons
           mv -t simpleicons/doc simpleicons.pdf simpleicons.tex bindings.tex
           cp simpleicons/doc/simpleicons.pdf .
+
           mv *.enc simpleicons/enc
           mv simpleicons.map simpleicons/map
           mv SimpleIcons.otf simpleicons/opentype
           mv -t simpleicons/tex simpleicons.sty *glyphs-*.tex *.fd
           mv *.tfm simpleicons/tfm
           mv SimpleIcons.pfb simpleicons/type1
-      - name: Create archive
-        working-directory: simpleicons
-        run: zip -r ../simpleicons.zip ./*
+
+          zip -r simpleicons.zip ./simpleicons
       - uses: paolobrasolin/ctan-submit-action@v1
         with:
+          action: upload
           file_path: simpleicons.zip
           fields: |
+            update: "true"
             pkg: simpleicons
             version: ${{ steps.get-version.outputs.si }}
-            author: Inesh Bose
+            uploader: Inesh Bose
             email: Inesh.Bose@glasgow.ac.uk
-            uploader: Inesh.Bose@glasgow.ac.uk
-            license: CC0-1.0
-            summary: Update version
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
