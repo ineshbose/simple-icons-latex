@@ -1,23 +1,12 @@
+const NUMBERS = require("./numbers.json");
 const { version, dependencies } = require("./package.json");
 const { writeFileSync, renameSync } = require("fs");
 const { execSync } = require("child_process");
 const { loadSync, Font } = require("opentype.js");
 
-const write = (file, data) => writeFileSync(file, data, { flag: "a+" });
 const date = new Date().toISOString().slice(0, 10).replace(/\-/g, "/");
-const NUMBERS = [
-  "zero",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-  "ten",
-];
+const write = (file, data) => writeFileSync(file, data, { flag: "a+" });
+const digrep = (number) => String(number).split("").map((n) => NUMBERS[n]).join('');
 const incompatGlyphs = ["lerna"];
 
 const {
@@ -58,7 +47,7 @@ glyphs.forEach(({ name, unicode }, idx) => {
       write(encfiles[fileCount - 1], "] def\n");
     }
 
-    const encfile = `simpleicons${NUMBERS[fileCount + 1]}`;
+    const encfile = `simpleicons${digrep(fileCount + 1)}`;
     encfiles.push(`${encfile}.enc`);
     write(`${encfile}.enc`, `/${encfile} [\n`);
   }
@@ -74,7 +63,7 @@ glyphs.forEach(({ name, unicode }, idx) => {
     "simpleiconsglyphs-pdftex.tex",
     String.raw`
   \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap${
-      NUMBERS[encfiles.length]
+    digrep(encfiles.length)
     }\symbol{${idx % 256}}}`
   );
   write(
@@ -157,7 +146,7 @@ ${encfiles
     const filename = file.slice(0, file.length - 4);
     return String.raw`
   \DeclareRobustCommand\simpleiconsmap${
-    NUMBERS[idx + 1]
+    digrep(idx + 1)
   }{\fontencoding{U}\fontfamily{${filename}}\selectfont}
   `;
   })
