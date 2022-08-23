@@ -68,12 +68,12 @@ glyphs.forEach(({ name, unicode }, idx) => {
   write(
     "simpleiconsglyphs-xeluatex.tex",
     String.raw`
-  \expandafter\def\csname simpleicon@${name}\endcsname {\SI\symbol{"${hexUnicode}}}`
+  \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap\symbol{"${hexUnicode}}}`
   );
   write(
     "simpleiconsglyphs-pdftex.tex",
     String.raw`
-  \expandafter\def\csname simpleicon@${name}\endcsname {\SI${
+  \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap${
       NUMBERS[encfiles.length]
     }\symbol{${idx % 256}}}`
   );
@@ -147,7 +147,7 @@ write(
 \ifsimpleicons@otf
 \usepackage{fontspec}
 
-\newfontfamily{\SI}{SimpleIcons}
+\newfontfamily{\simpleiconsmap}{SimpleIcons}
 \input{simpleiconsglyphs-xeluatex.tex}
 
 \else
@@ -156,7 +156,7 @@ ${encfiles
   .map((file, idx) => {
     const filename = file.slice(0, file.length - 4);
     return String.raw`
-  \DeclareRobustCommand\SI${
+  \DeclareRobustCommand\simpleiconsmap${
     NUMBERS[idx + 1]
   }{\fontencoding{U}\fontfamily{${filename}}\selectfont}
   `;
