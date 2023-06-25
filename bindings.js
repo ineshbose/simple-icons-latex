@@ -122,13 +122,9 @@ write(
   } Logos]
 
 
-\RequirePackage{ifxetex,ifluatex}
+\RequirePackage{iftex}
 \newif\ifsimpleicons@otf\simpleicons@otffalse
-\ifxetex
-  \simpleicons@otftrue
-\else
-  \ifluatex
-    \simpleicons@otftrue\fi\fi
+\iftutex\simpleicons@otftrue\fi
 
 \newcommand*{\simpleicon}[1]{%
   {\csname simpleicon@#1\endcsname}}
