@@ -132,7 +132,7 @@ write(
 \ifsimpleicons@otf
 \usepackage{fontspec}
 
-\newfontfamily{\simpleiconsmap}{SimpleIcons}
+\newfontfamily{\simpleiconsmap}{SimpleIcons.otf}
 \input{simpleiconsglyphs-xeluatex.tex}
 
 \else
