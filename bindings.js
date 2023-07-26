@@ -123,18 +123,15 @@ write(
 
 
 \RequirePackage{iftex}
-\newif\ifsimpleicons@otf\simpleicons@otffalse
-\iftutex\simpleicons@otftrue\fi
 
 \newcommand*{\simpleicon}[1]{%
   {\csname simpleicon@#1\endcsname}}
 
-\ifsimpleicons@otf
-\usepackage{fontspec}
 
+\iftutex
+\usepackage{fontspec}
 \newfontfamily{\simpleiconsmap}{SimpleIcons.otf}
 \input{simpleiconsglyphs-xeluatex.tex}
-
 \else
 
 ${encfiles
