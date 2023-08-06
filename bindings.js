@@ -85,6 +85,12 @@ for (
 }
 
 write(encfiles[encfiles.length - 1], "] def\n");
+
+execSync(
+  `fontforge -script scripts/convert.pe ${"SimpleIcons.otf"}`,
+  { encoding: "utf-8" }
+);
+
 write(
   "simpleicons.map",
   encfiles
@@ -99,10 +105,13 @@ write(
         \endinput
         `
       );
-      return execSync(
-        `fontforge -script scripts/convert.pe ${"SimpleIcons.otf"}`,
-        { encoding: "utf-8" }
-      ).replace(/SimpleIconsFiltered/g, "SimpleIcons");
+      return execSync( 
+        [ 
+          `afm2tfm ${"SimpleIcons.afm"}`, 
+          `-T ${file} SimpleIcons--${filename}.tfm`, 
+        ].join(" "), 
+        { encoding: "utf-8" } 
+      ).replace(/SimpleIconsFiltered/g, "SimpleIcons"); 
     })
     .join("")
 );
