@@ -462,6 +462,7 @@ TSWLatexianTemp*
 *.suit
 *.enc
 *.map
+*.afm
 
 bindings.tex
 *glyphs-*.tex

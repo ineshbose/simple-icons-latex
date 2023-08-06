@@ -45,8 +45,8 @@ jobs:
           git pull origin develop
           git tag -a "${{ steps.get-version.outputs.si }}" -m ""
           git push --follow-tags origin master
-      - name: Install otftotfm
-        run: sudo apt-get install -y lcdf-typetools
+      - name: Install fontforge
+        run: sudo apt-get install -y fontforge
       - name: Install dependencies
         run: yarn
       - name: Run script
@@ -56,20 +56,7 @@ jobs:
         with:
           root_file: simpleicons.tex
       - name: Move files and make archive
-        run: |
-          mkdir -p simpleicons simpleicons/{doc,enc,map,opentype,tex,tfm,type1}
-          cp README.md simpleicons
-          mv -t simpleicons/doc simpleicons.pdf simpleicons.tex bindings.tex
-          cp simpleicons/doc/simpleicons.pdf .
-
-          mv *.enc simpleicons/enc
-          mv simpleicons.map simpleicons/map
-          mv SimpleIcons.otf simpleicons/opentype
-          mv -t simpleicons/tex simpleicons.sty *glyphs-*.tex *.fd
-          mv *.tfm simpleicons/tfm
-          mv SimpleIcons.pfb simpleicons/type1
-
-          zip -r simpleicons.zip ./simpleicons
+        run: ./scripts/archiver.sh
       - uses: paolobrasolin/ctan-submit-action@v1
         with:
           action: upload

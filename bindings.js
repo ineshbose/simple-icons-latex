@@ -100,18 +100,12 @@ write(
         `
       );
       return execSync(
-        [
-          `otftotfm ${"SimpleIcons.otf"}`,
-          `--literal-encoding=${file}`,
-          `--name=SimpleIcons--${filename}`,
-        ].join(" "),
+        `fontforge -script scripts/convert.pe ${"SimpleIcons.otf"}`,
         { encoding: "utf-8" }
       ).replace(/SimpleIconsFiltered/g, "SimpleIcons");
     })
     .join("")
 );
-
-renameSync("SimpleIconsFiltered.pfb", "SimpleIcons.pfb");
 
 write(
   "simpleicons.sty",
