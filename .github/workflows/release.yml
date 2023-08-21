@@ -19,7 +19,7 @@ jobs:
           version="$(cat package.json | jq -r '.version')"
           echo "::set-output name=si::$version"
       - name: Install system dependencies
-        run: sudo apt-get install -y fontforge lcdf-typetools
+        run: sudo apt-get update -y && sudo apt-get install -y fontforge lcdf-typetools
       - name: Install node dependencies
         run: yarn
       - name: Run script
