@@ -1,6 +1,6 @@
 const NUMBERS = require("./numbers.json");
 const { version, dependencies } = require("./package.json");
-const { writeFileSync, renameSync } = require("fs");
+const { writeFileSync } = require("fs");
 const { execSync } = require("child_process");
 const { loadSync, Font } = require("opentype.js");
 
@@ -105,13 +105,14 @@ write(
         \endinput
         `
       );
-      return execSync( 
-        [ 
-          `afm2tfm ${"SimpleIcons.afm"}`, 
-          `-T ${file} SimpleIcons--${filename}.tfm`, 
-        ].join(" "), 
-        { encoding: "utf-8" } 
-      ).replace(/SimpleIconsFiltered/g, "SimpleIcons"); 
+      return execSync(
+        [
+          `otftotfm ${"SimpleIcons.otf"}`,
+          `--literal-encoding=${file}`,
+          `--name=SimpleIcons--${filename}`,
+        ].join(" "),
+        { encoding: "utf-8" }
+      ).replace(/SimpleIconsFiltered/g, "SimpleIcons");
     })
     .join("")
 );

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-rm *.{tfm,enc,fd}
-rm simpleicons.{log,map,sty,pdf,zip}
-rm SimpleIcons.{otf,pfb,afm}
-rm simpleiconsglyphs-*.tex
-rm bindings.tex
+rm -f *.{tfm,enc,fd}
+rm -f simpleicons.{log,map,sty,aux,out,pdf,zip}
+rm -f SimpleIcons.{otf,pfb,afm}
+rm -f simpleiconsglyphs-*.tex
+rm -f bindings.tex

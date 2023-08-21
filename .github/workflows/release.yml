@@ -45,9 +45,9 @@ jobs:
           git pull origin develop
           git tag -a "${{ steps.get-version.outputs.si }}" -m ""
           git push --follow-tags origin master
-      - name: Install fontforge
-        run: sudo apt-get install -y fontforge
-      - name: Install dependencies
+      - name: Install system dependencies
+        run: sudo apt-get install -y fontforge lcdf-typetools
+      - name: Install node dependencies
         run: yarn
       - name: Run script
         run: node bindings.js
