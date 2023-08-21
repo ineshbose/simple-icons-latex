@@ -1,8 +1,8 @@
 name: Release latest version
 on:
-  schedule:
-    - cron: 0 0 * * 5
-  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
 
 jobs:
   auto-release:
@@ -11,43 +11,16 @@ jobs:
       - name: Setup repository
         uses: actions/checkout@v3
         with:
-          ref: develop
+          ref: master
           fetch-depth: 0
       - name: Get release version
         id: get-version
         run: |
-          simple_icons_version="$(curl --retry 5 -s https://api.github.com/repos/simple-icons/simple-icons-font/releases/latest | jq -r .tag_name)"
-          echo "::set-output name=si::$simple_icons_version"
-          echo "::set-output name=lib::$(cat package.json | grep '"version":' | cut -d'"' -f4)"
-      - name: Cancel if not new version
-        uses: actions/github-script@v6
-        if: ${{ steps.get-version.outputs.lib == steps.get-version.outputs.si }}
-        with:
-          script: |
-            github.rest.actions.cancelWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-            })
-      - name: Bump version and commit
-        run: |
-          sed -i 's/"version": "${{ steps.get-version.outputs.lib }}",/"version": "${{ steps.get-version.outputs.si }}",/' package.json
-          sed -i 's/"simple-icons-font": "${{ steps.get-version.outputs.lib }}"/"simple-icons-font": "${{ steps.get-version.outputs.si }}"/' package.json
-
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-
-          git add .
-          git commit -m "Version bump"
-          git push origin develop
-
-          git switch master
-          git pull origin develop
-          git tag -a "${{ steps.get-version.outputs.si }}" -m ""
-          git push --follow-tags origin master
-      - name: Install otftotfm
-        run: sudo apt-get install -y lcdf-typetools
-      - name: Install dependencies
+          version="$(cat package.json | jq -r '.version')"
+          echo "::set-output name=si::$version"
+      - name: Install system dependencies
+        run: sudo apt-get install -y fontforge lcdf-typetools
+      - name: Install node dependencies
         run: yarn
       - name: Run script
         run: node bindings.js
@@ -56,20 +29,7 @@ jobs:
         with:
           root_file: simpleicons.tex
       - name: Move files and make archive
-        run: |
-          mkdir -p simpleicons simpleicons/{doc,enc,map,opentype,tex,tfm,type1}
-          cp README.md simpleicons
-          mv -t simpleicons/doc simpleicons.pdf simpleicons.tex bindings.tex
-          cp simpleicons/doc/simpleicons.pdf .
-
-          mv *.enc simpleicons/enc
-          mv simpleicons.map simpleicons/map
-          mv SimpleIcons.otf simpleicons/opentype
-          mv -t simpleicons/tex simpleicons.sty *glyphs-*.tex *.fd
-          mv *.tfm simpleicons/tfm
-          mv SimpleIcons.pfb simpleicons/type1
-
-          zip -r simpleicons.zip ./simpleicons
+        run: ./scripts/archiver.sh
       - uses: paolobrasolin/ctan-submit-action@v1
         with:
           action: upload

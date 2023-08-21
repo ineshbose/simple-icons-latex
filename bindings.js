@@ -1,6 +1,6 @@
 const NUMBERS = require("./numbers.json");
 const { version, dependencies } = require("./package.json");
-const { writeFileSync, renameSync } = require("fs");
+const { writeFileSync } = require("fs");
 const { execSync } = require("child_process");
 const { loadSync, Font } = require("opentype.js");
 
@@ -85,6 +85,12 @@ for (
 }
 
 write(encfiles[encfiles.length - 1], "] def\n");
+
+execSync(
+  `fontforge -script scripts/convert.pe ${"SimpleIcons.otf"}`,
+  { encoding: "utf-8" }
+);
+
 write(
   "simpleicons.map",
   encfiles
@@ -110,8 +116,6 @@ write(
     })
     .join("")
 );
-
-renameSync("SimpleIconsFiltered.pfb", "SimpleIcons.pfb");
 
 write(
   "simpleicons.sty",
