@@ -1,4 +1,4 @@
-name: Release latest version
+name: Fetch latest version
 on:
   schedule:
     - cron: 0 0 * * 5
