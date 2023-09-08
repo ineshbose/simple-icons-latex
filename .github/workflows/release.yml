@@ -44,7 +44,7 @@ jobs:
             pkg: simpleicons
             version: ${{ steps.get-version.outputs.si }}
             uploader: Inesh Bose
-            email: ctan@inesh.xyz
+            email: ${{ secrets.UPLOAD_EMAIL }}
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
