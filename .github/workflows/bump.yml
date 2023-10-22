@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: develop
           fetch-depth: 0
@@ -31,14 +31,14 @@ jobs:
             })
       - name: Bump version and commit
         run: |
-          sed -i 's/"version": "${{ steps.get-version.outputs.lib }}",/"version": "${{ steps.get-version.outputs.si }}",/' package.json
-          sed -i 's/"simple-icons-font": "${{ steps.get-version.outputs.lib }}"/"simple-icons-font": "${{ steps.get-version.outputs.si }}"/' package.json
+          echo "`jq '.version="${{ steps.get-version.outputs.si }}"' package.json`" > package.json
+          echo "`jq '.dependencies."simple-icons-font"="${{ steps.get-version.outputs.si }}"' package.json`" > package.json
 
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
           git add .
-          git commit -m "Version bump"
+          git commit -m "version bump"
           git push origin develop
 
           git switch master

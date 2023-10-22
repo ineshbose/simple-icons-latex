@@ -7,7 +7,6 @@ const { loadSync, Font } = require("opentype.js");
 const date = new Date().toISOString().slice(0, 10).replace(/\-/g, "/");
 const write = (file, data) => writeFileSync(file, data, { flag: "a+" });
 const digrep = (number) => String(number).split("").map((n) => NUMBERS[n]).join('');
-const incompatGlyphs = ["lerna"];
 
 const {
   unitsPerEm,
@@ -19,10 +18,8 @@ const glyphs = [];
 
 for (var i = 0; i < rawGlyphs.length; i++) {
   const glyph = rawGlyphs.get(i);
-  if (glyph.name && glyph.unicode && !incompatGlyphs.includes(glyph.name)) {
-    glyph.name = glyph.name.replace(/[^a-zA-Z0-9 ]/g, "");
-    glyphs.push(glyph);
-  }
+  glyph.name = glyph.name?.replace(/[^a-zA-Z0-9 ]/g, "") || '';
+  glyphs.push(glyph);
 }
 
 const font = new Font({
@@ -38,41 +35,43 @@ font.download("SimpleIcons.otf");
 write("bindings.tex", String.raw`\begin{showcase}`);
 
 const encfiles = [];
-glyphs.forEach(({ name, unicode }, idx) => {
-  const { length: fileCount } = encfiles;
-  const hexUnicode = unicode.toString(16).toUpperCase();
+glyphs
+  .filter((g) => g.name && g.unicode)
+  .forEach(({ name, unicode }, idx) => {
+    const { length: fileCount } = encfiles;
+    const hexUnicode = unicode.toString(16).toUpperCase();
 
-  if (idx % 256 == 0) {
-    if (fileCount > 0) {
-      write(encfiles[fileCount - 1], "] def\n");
+    if (idx % 256 == 0) {
+      if (fileCount > 0) {
+        write(encfiles[fileCount - 1], "] def\n");
+      }
+
+      const encfile = `simpleicons${digrep(fileCount + 1)}`;
+      encfiles.push(`${encfile}.enc`);
+      write(`${encfile}.enc`, `/${encfile} [\n`);
     }
 
-    const encfile = `simpleicons${digrep(fileCount + 1)}`;
-    encfiles.push(`${encfile}.enc`);
-    write(`${encfile}.enc`, `/${encfile} [\n`);
-  }
+    write(encfiles[encfiles.length - 1], `/${name}\n`);
 
-  write(encfiles[encfiles.length - 1], `/${name}\n`);
-
-  write(
-    "simpleiconsglyphs-xeluatex.tex",
-    String.raw`
-  \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap\symbol{"${hexUnicode}}}`
-  );
-  write(
-    "simpleiconsglyphs-pdftex.tex",
-    String.raw`
-  \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap${
-    digrep(encfiles.length)
-    }\symbol{${idx % 256}}}`
-  );
-  write(
-    "bindings.tex",
-    String.raw`
-  \showcaseicon{${name}}{simpleicon\{${name}\}}
-  `
-  );
-});
+    write(
+      "simpleiconsglyphs-xeluatex.tex",
+      String.raw`
+    \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap\symbol{"${hexUnicode}}}`
+    );
+    write(
+      "simpleiconsglyphs-pdftex.tex",
+      String.raw`
+    \expandafter\def\csname simpleicon@${name}\endcsname {\simpleiconsmap${
+      digrep(encfiles.length)
+        }\symbol{${idx % 256}}}`
+    );
+    write(
+      "bindings.tex",
+      String.raw`
+    \showcaseicon{${name}}{simpleicon\{${name}\}}
+    `
+    );
+  });
 
 write("bindings.tex", String.raw`\end{showcase}`);
 
@@ -123,7 +122,7 @@ write(
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{simpleicons}[${date} ${version} Simple Icons ${
     dependencies["simple-icons-font"]
-  } Logos]
+    } Logos]
 
 
 \RequirePackage{iftex}
@@ -139,15 +138,15 @@ write(
 \else
 
 ${encfiles
-  .map((file, idx) => {
-    const filename = file.slice(0, file.length - 4);
-    return String.raw`
+      .map((file, idx) => {
+        const filename = file.slice(0, file.length - 4);
+        return String.raw`
   \DeclareRobustCommand\simpleiconsmap${
     digrep(idx + 1)
-  }{\fontencoding{U}\fontfamily{${filename}}\selectfont}
+          }{\fontencoding{U}\fontfamily{${filename}}\selectfont}
   `;
-  })
-  .join("")}
+      })
+      .join("")}
 \input{simpleiconsglyphs-pdftex.tex}
 
 \fi
