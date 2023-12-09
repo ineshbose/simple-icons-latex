@@ -18,7 +18,11 @@ const glyphs = [];
 
 for (var i = 0; i < rawGlyphs.length; i++) {
   const glyph = rawGlyphs.get(i);
-  glyph.name = glyph.name?.replace(/[^a-zA-Z0-9 ]/g, "") || '';
+  
+  if (glyph.name) {
+    glyph.name = glyph.name.replace(/[^a-zA-Z0-9 ]/g, "") + 'icon';
+  }
+
   glyphs.push(glyph);
 }
 
@@ -65,10 +69,12 @@ glyphs
       digrep(encfiles.length)
         }\symbol{${idx % 256}}}`
     );
+
+    const inputName = name.replace(/icon$/, '')
     write(
       "bindings.tex",
       String.raw`
-    \showcaseicon{${name}}{simpleicon\{${name}\}}
+    \showcaseicon{${inputName}}{simpleicon\{${inputName}\}}
     `
     );
   });
@@ -128,7 +134,7 @@ write(
 \RequirePackage{iftex}
 
 \newcommand*{\simpleicon}[1]{%
-  {\csname simpleicon@#1\endcsname}}
+  {\csname simpleicon@#1icon\endcsname}}
 
 
 \iftutex

@@ -30,6 +30,9 @@ jobs:
         run: yarn
       - name: Run script
         run: node bindings.js
+      - name: Add version to doc
+        run: |
+          sed -i 's|\maketitle|\date{${{ steps.get-version.outputs.si }} -- \\today}\\maketitle|' simpleicons.tex
       - name: Compile doc
         uses: xu-cheng/latex-action@v3
         with:
