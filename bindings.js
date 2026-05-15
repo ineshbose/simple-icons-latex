@@ -1,8 +1,8 @@
 const NUMBERS = require("./numbers.json");
 const { version, dependencies } = require("./package.json");
-const { writeFileSync } = require("fs");
+const { writeFileSync, readFileSync } = require("fs");
 const { execSync } = require("child_process");
-const { loadSync, Font } = require("opentype.js");
+const { parse, Font } = require("opentype.js");
 
 const date = new Date().toISOString().slice(0, 10).replace(/\-/g, "/");
 const write = (file, data) => writeFileSync(file, data, { flag: "a+" });
@@ -13,7 +13,7 @@ const {
   ascender,
   descender,
   glyphs: rawGlyphs,
-} = loadSync("node_modules/simple-icons-font/font/SimpleIcons.otf");
+} = parse(readFileSync("node_modules/simple-icons-font/font/SimpleIcons.otf"));
 const glyphs = [];
 
 for (var i = 0; i < rawGlyphs.length; i++) {
