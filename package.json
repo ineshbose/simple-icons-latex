@@ -1,12 +1,12 @@
 {
   "name": "simple-icons-latex",
-  "version": "16.20.0",
+  "version": "16.21.0",
   "main": "bindings.js",
   "repository": "https://github.com/ineshbose/simple-icons-latex",
   "author": "Inesh Bose",
   "license": "CC0-1.0",
   "dependencies": {
     "opentype.js": "^2.0.0",
-    "simple-icons-font": "16.20.0"
+    "simple-icons-font": "16.21.0"
   }
 }
