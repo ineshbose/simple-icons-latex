@@ -30,7 +30,7 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update -y && sudo apt-get install -y fontforge lcdf-typetools
       - name: Install node dependencies
-        run: yarn
+        run: npm i
       - name: Run script
         run: node bindings.js
       - name: Add version to doc
