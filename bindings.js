@@ -1,7 +1,7 @@
 const NUMBERS = require("./numbers.json");
 const { version, dependencies } = require("./package.json");
 const { writeFileSync, readFileSync } = require("fs");
-const { execSync } = require("child_process");
+const { execSync, execFileSync } = require("child_process");
 const { parse, Font } = require("opentype.js");
 
 const date = new Date().toISOString().slice(0, 10).replace(/\-/g, "/");
@@ -110,12 +110,13 @@ write(
         \endinput
         `
       );
-      return execSync(
+      return execFileSync(
+        "otftotfm",
         [
-          `otftotfm ${"SimpleIcons.otf"}`,
+          "SimpleIcons.otf",
           `--literal-encoding=${file}`,
           `--name=SimpleIcons--${filename}`,
-        ].join(" "),
+        ],
         { encoding: "utf-8" }
       ).replace(/SimpleIconsFiltered/g, "SimpleIcons");
     })
